@@ -10,6 +10,12 @@
 #define P2 
 #define P3 
 
+#define DISCONECTED 0
+#define STOPPED 1
+#define RUNNING 2
+
+byte state = 0;
+
 byte lastState = 0;
 
 void setup() {
@@ -79,6 +85,41 @@ void moveDown() {
   digitalWrite(RIGHT, 0);
 }
 
-void electrify() {
+void stopMove() {
+  digitalWrite(UP, 0);
+  digitalWrite(DOWN, 0);
+  digitalWrite(LEFT, 0);
+  digitalWrite(RIGHT, 0);
+}
+
+void initMove() {
+  while(!digitalRead(SUP)) moveUp();
+  moveRigth();
+  for(int i = 0; i < 500; i++) {
+    if(lastState != 0) break;
+  }
+  moveLeft();
+  while(lastState == 0);
+  stopMove(); 
   
+}
+
+void magnetOn() {
+  digitalWrite(PICK, 1);
+}
+
+void magnetOff() {
+  digitalWrite(PICK, 0);
+}
+
+void goTo(byte destination) {
+  while(destination != lastState) {
+    if(destination < lastState) {
+      
+    } else if(destination > lastState) {
+      
+    } else {
+      
+    }
+  }
 }
