@@ -170,6 +170,21 @@ void translate(byte origin, byte destination) {
   placeIn(destination);
 }
 
-void hanoi() {
-  
+byte getRemaining(byte a, byte b) {
+  if((a == 1 || b == 1) && (a == 2 || b == 2)) return 3;
+  if((a == 1 || b == 1) && (a == 3 || b == 3)) return 2;
+  if((a == 2 || b == 2) && (a == 3 || b == 3)) return 1;
+}
+
+void hanoi(byte origin, byte destination) {
+  hanoiAux();
+}
+
+void hanoiAux(byte n, byte origin, byte destination, byte aux) {
+  if(n == 1) translate(origin, dest);
+  else {
+    hanoiAux(n-1, origin, aux, destination);
+    translate(origin, dest);
+    hanoiAux(n-1, aux, destination, origin);
+  }
 }
