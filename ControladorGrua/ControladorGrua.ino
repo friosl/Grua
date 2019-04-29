@@ -1,14 +1,14 @@
-#define UP 
-#define DOWN 
-#define LEFT 
-#define RIGHT 
-#define PICK 
+#define UP 1
+#define DOWN 1
+#define LEFT 1
+#define RIGHT 1
+#define PICK 1
 
-#define SUP 
-#define SDOWN 
-#define P1 
-#define P2 
-#define P3 
+#define SUP 1
+#define SDOWN 1
+#define P1 1
+#define P2 1
+#define P3 1
 
 #define DISCONECTED 0
 #define STOPPED 1
@@ -16,7 +16,7 @@
 
 byte state = 0;
 
-byte lastState = 0;
+byte actual = 0, last = 0;
 
 void setup() {
   pinMode(UP, OUTPUT);
@@ -42,15 +42,18 @@ void loop() {
 }
 
 void updateTo1() {
-  lastState = 1;
+  last = actual;
+  actual = 1;
 }
 
 void updateTo2() {
-  lastState = 3;
+  last = actual;
+  actual = 2;
 }
 
 void updateTo3() {
-  lastState = 3;
+  last = actual;
+  actual = 3;
 }
 
 void processRequest() {
@@ -93,15 +96,20 @@ void stopMove() {
 }
 
 void initMove() {
-  while(!digitalRead(SUP)) moveUp();
+  moveUp();
+  while(!digitalRead(SUP));
   moveRigth();
-  for(int i = 0; i < 500; i++) {
-    if(lastState != 0) break;
+  for(int i = 0; i < 100; i++) {
+    //if(lastState != 0) break;
+    delay(2);
   }
   moveLeft();
-  while(lastState == 0);
+  for(int i = 0; i < 100; i++) {
+    //if(lastState != 0) break;
+    delay(2);
+  }
+  //while(lastState == 0);
   stopMove(); 
-  
 }
 
 void magnetOn() {
@@ -112,14 +120,56 @@ void magnetOff() {
   digitalWrite(PICK, 0);
 }
 
+void pick() {
+  moveDown();
+  for(int i = 0; i < 1000 || digitalRead(SDOWN); i++) delay(2);
+  magnetOn();
+  stopMove();
+  delay(10);
+  moveUp();
+  while(!digitalRead(SUP));
+  stopMove();
+}
+
+void place() {
+  moveDown();
+  while(!digitalRead(SDOWN));
+  stopMove();
+  magnetOff();
+  moveUp();
+  while(!digitalRead(SUP));
+  stopMove();
+}
+
 void goTo(byte destination) {
-  while(destination != lastState) {
-    if(destination < lastState) {
-      
-    } else if(destination > lastState) {
-      
-    } else {
-      
-    }
+  moveUp();
+  while(!digitalRead(SUP));
+  stopMove();
+  if(destination < actual) moveLeft();
+  else if(destination > actual) moveRigth();
+  else {
+    if(destination < last) moveLeft();
+    else if(destination > last) moveRigth();
   }
+  while(destination != lastState);
+  stopMove(); 
+}
+
+void pickFrom(byte origin) {
+  goTo(origin);
+  pick();
+}
+
+void placeIn(byte destination) {
+  goTo(destination);
+  place();
+}
+
+void translate(byte origin, byte destination) {
+  pickFrom(origin);
+  placeIn(destination);
+}
+
+void hanoi() {
+  
 }
