@@ -1,14 +1,14 @@
-#define UP 1
-#define DOWN 1
-#define LEFT 1
-#define RIGHT 1
-#define PICK 1
+#define UP 23
+#define DOWN 22
+#define LEFT 25
+#define RIGHT 26
+#define PICK 24
 
-#define SUP 1
-#define SDOWN 1
-#define P1 1
-#define P2 1
-#define P3 1
+#define SUP 18
+#define SDOWN 29
+#define P1 21
+#define P2 20
+#define P3 19
 
 #define DISCONECTED 0
 #define STOPPED 1
@@ -36,6 +36,9 @@ void setup() {
   attachInterrupt(2, updateTo1, RISING);
   attachInterrupt(3, updateTo2, RISING);
   attachInterrupt(4, updateTo3, RISING);
+
+  initMove();
+  hanoi(3, 2);
 }
 
 void loop() {
@@ -46,23 +49,75 @@ void loop() {
 void updateTo1() {
   last = actual;
   actual = 1;
+  Serial.println(actual);
 }
 
 void updateTo2() {
   last = actual;
   actual = 2;
+  Serial.println(actual);
 }
 
 void updateTo3() {
   last = actual;
   actual = 3;
+  Serial.println(actual);
+}
+
+boolean readTower(byte p) {
+  if(p == 1) return digitalRead(P1);
+  if(p == 2) return digitalRead(P2);
+  if(p == 3) return digitalRead(P3);
+  return false;
 }
 
 void processRequest() {
+  int req = Serial.parseInt();
+  byte order1 = req % 10,
+  order2 = (req % 100) / 10,
+  order3= req/100;
+  
+  switch(order1) {
+    case 1:
+      switch(order2) {
+        case 1:
+          moveUp();
+          break;
+        case 2:
+          moveUp();
+          break;
+        case 3:
+          moveLeft();
+          break;
+        case 4:
+          moveRight();
+          break;
+      }
+      break;
+    case 2:
+
+      break;
+    case 3:
+
+      break;
+    case 4:
+
+      break;
+    case 5:
+
+      break;
+    case 6:
+
+      break;
+    case 7:
+
+      break;
+  }
   
 }
 
 void moveLeft() {
+  //Serial.println("izquierda");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 1);
@@ -70,6 +125,7 @@ void moveLeft() {
 }
 
 void moveRight() {
+  //Serial.println("derecha");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 0);
@@ -77,6 +133,7 @@ void moveRight() {
 }
 
 void moveUp() {
+  //Serial.println("arriba");
   digitalWrite(UP, 1);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 0);
@@ -84,6 +141,7 @@ void moveUp() {
 }
 
 void moveDown() {
+  //Serial.println("abajo");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 1);
   digitalWrite(LEFT, 0);
@@ -91,6 +149,7 @@ void moveDown() {
 }
 
 void stopMove() {
+  //Serial.println("parado");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 0);
@@ -98,15 +157,16 @@ void stopMove() {
 }
 
 void initMove() {
+  //Serial.println("movimiento iniciado");
   moveUp();
   while(!digitalRead(SUP));
-  moveRigth();
-  for(int i = 0; i < 100; i++) {
+  moveRight();
+  for(int i = 0; i < 500; i++) {
     //if(lastState != 0) break;
     delay(10);
   }
   moveLeft();
-  for(int i = 0; i < 100; i++) {
+  for(int i = 0; i < 500; i++) {
     //if(lastState != 0) break;
     delay(10);
   }
@@ -115,16 +175,19 @@ void initMove() {
 }
 
 void magnetOn() {
+  //Serial.println("on");
   digitalWrite(PICK, 1);
 }
 
 void magnetOff() {
+  //Serial.println("off");
   digitalWrite(PICK, 0);
 }
 
 void pick() {
+  //Serial.println("cogiendo");
   moveDown();
-  for(int i = 0; i < 1000 || digitalRead(SDOWN); i++) delay(2);
+  for(int i = 0; i < 1000 || !digitalRead(SDOWN); i++) delay(2);
   magnetOn();
   stopMove();
   delay(10);
@@ -134,6 +197,7 @@ void pick() {
 }
 
 void place() {
+  //Serial.println("poniendo");
   moveDown();
   while(!digitalRead(SDOWN));
   stopMove();
@@ -144,16 +208,18 @@ void place() {
 }
 
 void goTo(byte destination) {
+  Serial.print("yendo a ");
+  Serial.println(destination);
   moveUp();
   while(!digitalRead(SUP));
   stopMove();
   if(destination < actual) moveLeft();
-  else if(destination > actual) moveRigth();
-  else {
-    if(destination < last) moveLeft();
-    else if(destination > last) moveRigth();
-  }
-  while(destination != lastState);
+  else if(destination > actual) moveRight();
+//  else if(){
+//    if(destination < last) moveLeft();
+//    else moveRight();
+//  }
+  while(!readTower(destination));
   stopMove(); 
 }
 
@@ -175,13 +241,14 @@ void translate(byte origin, byte destination) {
 void hanoi(byte origin, byte destination) {
   byte rem = origin ^ destination;
   hanoiAux(3, origin, destination, rem);
+  Serial.println("Hanoi acabado");
 }
 
 void hanoiAux(byte n, byte origin, byte destination, byte aux) {
-  if(n == 1) translate(origin, dest);
+  if(n == 1) translate(origin, destination);
   else {
     hanoiAux(n-1, origin, aux, destination);
-    translate(origin, dest);
+    translate(origin, destination);
     hanoiAux(n-1, aux, destination, origin);
   }
 }
