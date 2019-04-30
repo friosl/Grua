@@ -101,12 +101,12 @@ void initMove() {
   moveRigth();
   for(int i = 0; i < 100; i++) {
     //if(lastState != 0) break;
-    delay(2);
+    delay(10);
   }
   moveLeft();
   for(int i = 0; i < 100; i++) {
     //if(lastState != 0) break;
-    delay(2);
+    delay(10);
   }
   //while(lastState == 0);
   stopMove(); 
@@ -177,7 +177,8 @@ byte getRemaining(byte a, byte b) {
 }
 
 void hanoi(byte origin, byte destination) {
-  hanoiAux();
+  byte rem = getRemaining(origin, destination);
+  hanoiAux(3, origin, destination, rem);
 }
 
 void hanoiAux(byte n, byte origin, byte destination, byte aux) {

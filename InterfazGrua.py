@@ -1,47 +1,67 @@
 from tkinter import *
+
+
 a = "text"
 
 def takefromto(x):
-        if x=="P1":
-            a
-def takefrom(x):
-        if x=="P1":
-            a.set("Hello")
-            print(a.get())
+        # if x=="P1":
+        #     a
+        print(x)
 
-        elif x=="P2":
-            a.set("bye")
-            print(a.get())
-        elif x=="P3":
-            a.set("algo")
-            print(a.get())
+def takefrom(x):
+        # if x=="P1":
+        #     a.set("Hello")
+        #     print(a.get())
+
+        # elif x=="P2":
+        #     a.set("bye")
+        #     print(a.get())
+        # elif x=="P3":
+        #     a.set("algo")
+        #     print(a.get())
+        print(x)
+
+def taketo(x):
+    print(x)
+
 def up():
     print("arriba")
     a
+
 def down():
     print("abajo")
     a
+
 def left():
     print("izquierda")
     a
+
 def right():
-    print("funciona")
+    print("derecha")
     a
+
 def stop():
     print("pare")
     a
+
 def first():
     a
+
 def second():
     a
+
 def third():
     a
+
 def magnet():
     a
+
 def taketo():
     a
+
 def hanoi():
     a
+
 
 Ventana=Tk()
 Ventana.geometry("800x600+0+0")
@@ -49,7 +69,7 @@ Ventana.title("Grúa")
 
 o1=StringVar(Ventana)
 o1.set("Selecciona")
-o = OptionMenu(Ventana,o1,"P1","P2","P3",command=takefrom)
+o = OptionMenu(Ventana, o1, "P1", "P2", "P3", command=takefrom)
 o.place(x = 30, y = 420)
 
 o2=StringVar(Ventana)
@@ -71,10 +91,10 @@ h.place(x = 150, y = 520)
 e1=Label(Ventana,text="Coger de:",fg='black',bg='ivory3').place(x=30,y=398)
 Ventana.config(bg="ivory3")
 #Ventana.config(width="1200"
-miframe=Frame()
-miframe.pack()
-miframe.config(bg="ivory3")
-miframe.config(width="800",height="400")
+# miframe=Frame()
+# miframe.pack()
+# miframe.config(bg="ivory3")
+# miframe.config(width="800",height="400")
 
 e2=Label(Ventana,text="Llevar hasta",fg='black',bg='ivory3').place(x = 250, y = 398)
 
