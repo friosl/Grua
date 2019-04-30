@@ -19,6 +19,8 @@ byte state = 0;
 byte actual = 0, last = 0;
 
 void setup() {
+  Serial.begin(9600);
+  
   pinMode(UP, OUTPUT);
   pinMode(DOWN, OUTPUT);
   pinMode(LEFT, OUTPUT);
@@ -170,14 +172,8 @@ void translate(byte origin, byte destination) {
   placeIn(destination);
 }
 
-byte getRemaining(byte a, byte b) {
-  if((a == 1 || b == 1) && (a == 2 || b == 2)) return 3;
-  if((a == 1 || b == 1) && (a == 3 || b == 3)) return 2;
-  if((a == 2 || b == 2) && (a == 3 || b == 3)) return 1;
-}
-
 void hanoi(byte origin, byte destination) {
-  byte rem = getRemaining(origin, destination);
+  byte rem = origin ^ destination;
   hanoiAux(3, origin, destination, rem);
 }
 
