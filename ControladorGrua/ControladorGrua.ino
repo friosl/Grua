@@ -38,7 +38,6 @@ void setup() {
   attachInterrupt(4, updateTo3, RISING);
 
   initMove();
-  hanoi(3, 2);
 }
 
 void loop() {
@@ -95,25 +94,52 @@ void processRequest() {
       }
       break;
     case 2:
-
+      switch(order2) {
+        case 1:
+          magnetOn();
+          break;
+        case 0:
+          magnetOff();
+          break;
+      }
       break;
     case 3:
-
+      switch(order2) {
+        case 1:
+          pick();
+          break;
+        case 0:
+          place();
+          break;
+      }
       break;
     case 4:
-
+      goTo(order2);
       break;
     case 5:
-
+      switch(order2) {
+        case 1:
+          pickFrom(order3);
+          break;
+        case 0:
+          placeIn(order3);
+          break;
+      }
       break;
     case 6:
-
+      translate(order3, order2);
       break;
     case 7:
-
+      hanoi(order3, order2);
+      break;
+    default:
+      stopMove();
       break;
   }
-  
+}
+
+void serialEvent() {
+  processRequest();
 }
 
 void moveLeft() {
