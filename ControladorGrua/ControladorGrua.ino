@@ -38,6 +38,7 @@ void setup() {
   attachInterrupt(4, updateTo3, RISING);
 
   initMove();
+  //hanoi(1,3);
 }
 
 void loop() {
@@ -48,19 +49,19 @@ void loop() {
 void updateTo1() {
   last = actual;
   actual = 1;
-  Serial.println(actual);
+  //Serial.println(actual);
 }
 
 void updateTo2() {
   last = actual;
   actual = 2;
-  Serial.println(actual);
+  //Serial.println(actual);
 }
 
 void updateTo3() {
   last = actual;
   actual = 3;
-  Serial.println(actual);
+  //Serial.println(actual);
 }
 
 boolean readTower(byte p) {
@@ -72,6 +73,7 @@ boolean readTower(byte p) {
 
 void processRequest() {
   int req = Serial.parseInt();
+  //Serial.println(req);
   byte order1 = req % 10,
   order2 = (req % 100) / 10,
   order3= req/100;
@@ -80,16 +82,16 @@ void processRequest() {
     case 1:
       switch(order2) {
         case 1:
-          moveUp();
+          stepUp();
           break;
         case 2:
-          moveUp();
+          stepDown();
           break;
         case 3:
-          moveLeft();
+          stepLeft();
           break;
         case 4:
-          moveRight();
+          stepRight();
           break;
       }
       break;
@@ -182,6 +184,30 @@ void stopMove() {
   digitalWrite(RIGHT, 0);
 }
 
+void stepUp() {
+  moveUp();
+  delay(150);
+  stopMove();
+}
+
+void stepDown() {
+  moveDown();
+  delay(150);
+  stopMove();
+}
+
+void stepLeft() {
+  moveLeft();
+  delay(150);
+  stopMove();
+}
+
+void stepRight() {
+  moveRight();
+  delay(150);
+  stopMove();
+}
+
 void initMove() {
   //Serial.println("movimiento iniciado");
   moveUp();
@@ -234,8 +260,8 @@ void place() {
 }
 
 void goTo(byte destination) {
-  Serial.print("yendo a ");
-  Serial.println(destination);
+  //Serial.print("yendo a ");
+  //Serial.println(destination);
   moveUp();
   while(!digitalRead(SUP));
   stopMove();
@@ -267,7 +293,7 @@ void translate(byte origin, byte destination) {
 void hanoi(byte origin, byte destination) {
   byte rem = origin ^ destination;
   hanoiAux(3, origin, destination, rem);
-  Serial.println("Hanoi acabado");
+  //Serial.println("Hanoi acabado");
 }
 
 void hanoiAux(byte n, byte origin, byte destination, byte aux) {
