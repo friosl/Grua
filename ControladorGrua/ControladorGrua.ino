@@ -1,69 +1,71 @@
+//Actuadores de la grúa
 #define UP 23
 #define DOWN 22
 #define LEFT 25
 #define RIGHT 26
 #define PICK 24
 
+//Sensores de la grúa
 #define SUP 18
 #define SDOWN 29
 #define P1 21
 #define P2 20
 #define P3 19
 
-#define DISCONECTED 0
-#define STOPPED 1
-#define RUNNING 2
-
-byte state = 0;
-
+//Últimas 2 estaciones por las que pasó la grua
 byte actual = 0, last = 0;
 
+//Setup del arduino
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600);       //Inicilaización del puerto serial 0. 
   
+  //Declaración actuadores como salidas del arduino
   pinMode(UP, OUTPUT);
   pinMode(DOWN, OUTPUT);
   pinMode(LEFT, OUTPUT);
   pinMode(RIGHT, OUTPUT);
   pinMode(PICK, OUTPUT);
 
+  //Declaración sensores como entradas del arduino
   pinMode(SUP, INPUT);
   pinMode(SDOWN, INPUT);
   pinMode(P1, INPUT);
   pinMode(P2, INPUT);
   pinMode(P3, INPUT);
 
+  //Interrupciones en cada sensor para actualizar las estaciones.
   attachInterrupt(2, updateTo1, RISING);
   attachInterrupt(3, updateTo2, RISING);
   attachInterrupt(4, updateTo3, RISING);
 
+  //Inicializar movimiento
   initMove();
-  //hanoi(1,3);
 }
 
+//Loop vacío
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }
 
+//Actualizar ultima estación a 1
 void updateTo1() {
   last = actual;
   actual = 1;
-  //Serial.println(actual);
 }
 
+//Actualizar ultima estación a 2
 void updateTo2() {
   last = actual;
   actual = 2;
-  //Serial.println(actual);
 }
 
+//Actualizar ultima estación a 3
 void updateTo3() {
   last = actual;
   actual = 3;
-  //Serial.println(actual);
 }
 
+//Revisa si la grua se encuentra en una estación p
 boolean readTower(byte p) {
   if(p == 1) return digitalRead(P1);
   if(p == 2) return digitalRead(P2);
@@ -71,6 +73,7 @@ boolean readTower(byte p) {
   return false;
 }
 
+//Decodifica la orden enviada por la interfaz a travez del serial.
 void processRequest() {
   int req = Serial.parseInt();
   //Serial.println(req);
@@ -140,34 +143,36 @@ void processRequest() {
   }
 }
 
+//Cuando se recibe una orden
 void serialEvent() {
   processRequest();
 }
 
+//Ir a izquierda infinitamente
 void moveLeft() {
-  //Serial.println("izquierda");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 1);
   digitalWrite(RIGHT, 0);
 }
 
+//Ir a derecha infinitamente
 void moveRight() {
-  //Serial.println("derecha");
   digitalWrite(UP, 0);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 0);
   digitalWrite(RIGHT, 1);
 }
 
+//Ir arriba infinitamente
 void moveUp() {
-  //Serial.println("arriba");
   digitalWrite(UP, 1);
   digitalWrite(DOWN, 0);
   digitalWrite(LEFT, 0);
   digitalWrite(RIGHT, 0);
 }
 
+//Ir abajo infinitamente
 void moveDown() {
   //Serial.println("abajo");
   digitalWrite(UP, 0);
@@ -176,6 +181,7 @@ void moveDown() {
   digitalWrite(RIGHT, 0);
 }
 
+//Parar el movimiento
 void stopMove() {
   //Serial.println("parado");
   digitalWrite(UP, 0);
@@ -184,58 +190,61 @@ void stopMove() {
   digitalWrite(RIGHT, 0);
 }
 
+//Hacia arriba por 150ms y luego parar
 void stepUp() {
   moveUp();
   delay(150);
   stopMove();
 }
 
+//Hacia abajo por 150ms y luego parar
 void stepDown() {
   moveDown();
   delay(150);
   stopMove();
 }
 
+//Hacia izquierda por 150ms y luego parar
 void stepLeft() {
   moveLeft();
   delay(150);
   stopMove();
 }
 
+//Hacia derecha por 150ms y luego parar
 void stepRight() {
   moveRight();
   delay(150);
   stopMove();
 }
 
+//5s hacia la derecha y luego 5s hacia la izquierda
 void initMove() {
-  //Serial.println("movimiento iniciado");
   moveUp();
   while(!digitalRead(SUP));
   moveRight();
   for(int i = 0; i < 500; i++) {
-    //if(lastState != 0) break;
     delay(10);
   }
   moveLeft();
   for(int i = 0; i < 500; i++) {
-    //if(lastState != 0) break;
     delay(10);
   }
-  //while(lastState == 0);
   stopMove(); 
 }
 
+//Magnetizar
 void magnetOn() {
-  //Serial.println("on");
   digitalWrite(PICK, 1);
 }
 
+//Desmagnetizar
 void magnetOff() {
   //Serial.println("off");
   digitalWrite(PICK, 0);
 }
 
+//Baja por 2s o hasta que encuentra algo, magetiza, y luego sube.
 void pick() {
   //Serial.println("cogiendo");
   moveDown();
@@ -248,8 +257,8 @@ void pick() {
   stopMove();
 }
 
+//Baja hasta que encuentra el fondo, desmagnetiza, y luego sube
 void place() {
-  //Serial.println("poniendo");
   moveDown();
   while(!digitalRead(SDOWN));
   stopMove();
@@ -259,43 +268,46 @@ void place() {
   stopMove();
 }
 
+//Va hasta una estación en específico
 void goTo(byte destination) {
-  //Serial.print("yendo a ");
-  //Serial.println(destination);
   moveUp();
   while(!digitalRead(SUP));
   stopMove();
   if(destination < actual) moveLeft();
   else if(destination > actual) moveRight();
-//  else if(){
-//    if(destination < last) moveLeft();
-//    else moveRight();
-//  }
+  else {
+    if(destination < last) moveLeft();
+    else moveRight();
+  }
   while(!readTower(destination));
   stopMove(); 
 }
 
+//Va hasta una estación y recoge una pieza(suponiendo que la hay)
 void pickFrom(byte origin) {
   goTo(origin);
   pick();
 }
 
+//Va hasta una estación y suelta una pieza(suponiendo que está agarrada)
 void placeIn(byte destination) {
   goTo(destination);
   place();
 }
 
+//Transporta una pieza de una estación a otra(suponiendo que la hay)
 void translate(byte origin, byte destination) {
   pickFrom(origin);
   placeIn(destination);
 }
 
+//método interfaz para hanoi
 void hanoi(byte origin, byte destination) {
   byte rem = origin ^ destination;
   hanoiAux(3, origin, destination, rem);
-  //Serial.println("Hanoi acabado");
 }
 
+//funcion para hanoi(algoritmo sacado de: https://medium.freecodecamp.org) 
 void hanoiAux(byte n, byte origin, byte destination, byte aux) {
   if(n == 1) translate(origin, destination);
   else {
